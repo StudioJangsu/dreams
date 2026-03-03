@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JADE 18 • ULTRA-VIP 3D ACCESS</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --black: #000000;
+            --white: #FFFFFF;
+            --neon-pink: #FF007F;
+            --deep-purple: #4A00E0;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --perspective: 1500px; /* Profundidad del mundo 3D */
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background-color: var(--black);
+            color: var(--white);
+            font-family: 'DM Sans', sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            perspective: var(--perspective); /* Habilita el mundo 3D */
+            min-height: 100vh;
+        }
+
+        /* 1. TEXTURA DE RUIDO (Retenida) */
+        .noise {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.05;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* 2. PARTÍCULAS Y OBJETOS 3D FLOTANTES (Fondo Dinámico) */
+        .background-3d {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+            transform-style: preserve-3d;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.5;
+            animation: floatBlobs 20s infinite ease-in-out alternate;
+        }
+        .blob-1 { width: 400px; height: 400px; background: var(--neon-pink); top: -10%; left: -10%; }
+        .blob-2 { width: 500px; height: 500px; background: var(--deep-purple); bottom: -20%; right: -10%; animation-delay: -5s; }
+
+        .floating-shape {
+            position: absolute;
+            color: var(--glass-border);
+            font-size: 1.5rem;
+            animation: float3D 15s infinite linear;
+            transform-style: preserve-3d;
+        }
+
+        @keyframes floatBlobs { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(50px, 100px, 50px); } }
+        @keyframes float3D {
+            0% { transform: translate3d(0,0,0) rotateX(0deg) rotateY(0deg) translateZ(0px); opacity: 0; }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { transform: translate3d(var(--moveX), var(--moveY), 100px) rotateX(360deg) rotateY(180deg) translateZ(100px); opacity: 0; }
+        }
+
+        /* Contenedor Principal (Perspective aplicado aquí también para móviles) */
+        .main-wrapper {
+            position: relative;
+            z-index: 1;
+            max-width: 500px;
+            margin: 0 auto;
+            padding-bottom: 80px;
+            transform-style: preserve-3d;
+        }
+
+        /* 3. SCROLL REVEAL 3D (Entrada volando) */
+        .reveal {
+            opacity: 0;
+            transform: translate3d(0, 50px, -200px) rotateX(-15deg); /* Entrada 3D profunda */
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+            backface-visibility: hidden;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translate3d(0, 0, 0) rotateX(0deg);
+        }
+
+        /* HERO SECTION (3D Parallax Title) */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            transform-style: preserve-3d; /* Clave para el efecto capas */
+        }
+
+        .hero-date {
+            font-size: 0.8rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: var(--white);
+            margin-bottom: 30px;
+            opacity: 0.7;
+        }
+
+        /* Contenedor del título con perspectiva propia */
+        .title-3d-container {
+            position: relative;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            margin-bottom: 40px;
+        }
+
+        .hero-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 5.5rem;
+            font-weight: 800;
+            line-height: 0.85;
+            text-transform: uppercase;
+            position: relative;
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
+        }
+
+        /* Capa de neón trasera (se mueve más lento) */
+        .hero-title.layer-back {
+            color: transparent;
+            -webkit-text-stroke: 1px var(--neon-pink);
+            position: absolute;
+            top: 2px; left: 2px; width: 100%;
+            transform: translateZ(-20px); /* Detrás */
+            filter: blur(2px);
+        }
+
+        /* Capa principal delantera (se mueve más rápido) */
+        .hero-title.layer-front {
+            color: var(--white);
+            transform: translateZ(20px); /* Delante */
+            text-shadow: 0 0 15px rgba(255, 0, 127, 0.5);
+        }
+
+        /* MARQUESINA (Inclinación 3D) */
+        .marquee-container {
+            width: 100%;
+            overflow: hidden;
+            background: var(--neon-pink);
+            color: var(--black);
+            padding: 18px 0;
+            position: relative;
+            transform: rotateX(10deg) rotateY(-5deg) rotateZ(-3deg) translateZ(30px); /* Inclinación 3D */
+            margin: 60px 0;
+            transform-style: preserve-3d;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .marquee-content {
+            display: flex;
+            white-space: nowrap;
+            font-family: 'Syne', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            animation: scrollMarquee 20s linear infinite;
+        }
+        .marquee-content span { padding: 0 25px; }
+        @keyframes scrollMarquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+        /* BENTO BOX LAYOUT (Tarjetas Volumétricas) */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 0 20px;
+            margin-bottom: 50px;
+            transform-style: preserve-3d;
+        }
+
+        /* Tarjeta 3D Base */
+        .bento-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px 20px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            transform-style: preserve-3d;
+            transition: transform 0.2s ease-out; /* Volumetría controlado por JS */
+            backface-visibility: hidden;
+        }
+
+        .bento-card.full { grid-column: span 2; }
+
+        /* Elementos dentro de la tarjeta contranslateZ para flotar */
+        .bento-card-content {
+            transform: translateZ(30px); /* El contenido flota fuera de la tarjeta */
+            transform-style: preserve-3d;
+        }
+
+        .bento-card h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.1rem;
+            color: var(--neon-pink);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transform: translateZ(20px);
+        }
+
+        .bento-card p { font-size: 0.95rem; color: #BBBBBB; line-height: 1.6; transform: translateZ(10px); }
+        .bento-card strong { color: var(--white); font-weight: 500; }
+
+        .bento-icon {
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            color: var(--white);
+            display: inline-block;
+            transform: translateZ(40px); /* Icono flota más arriba */
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.3));
+        }
+
+        /* RELOJ (Minimalista 3D) */
+        .countdown {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            transform-style: preserve-3d;
+        }
+
+        .countdown div { text-align: center; transform: translateZ(20px); }
+        .countdown span { display: block; font-family: 'Syne', sans-serif; font-size: 2.8rem; font-weight: 800; line-height: 1; color: var(--white); }
+        .countdown small { font-size: 0.6rem; letter-spacing: 2px; color: #888; text-transform: uppercase; }
+
+        /* DRESS CODE CON PROFUNDIDAD */
+        .dress-code-card {
+            background-image: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.95)), url('https://images.unsplash.com/photo-1550686520-a6164228c2e9?q=80&w=800&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            transform-style: preserve-3d;
+        }
+        .dress-code-card .bento-card-content {
+            transform: translateZ(50px);
+        }
+
+        /* MOODBOARD GALERÍA (Snap 3D) */
+        .gallery-wrapper {
+            padding: 0 0 50px 20px;
+            transform-style: preserve-3d;
+        }
+        .gallery-title { font-family: 'Syne', sans-serif; font-size: 2.8rem; text-transform: uppercase; margin-bottom: 25px; color: var(--white); }
+        .gallery-scroll { display: flex; gap: 18px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding-right: 20px; transform-style: preserve-3d;}
+        .gallery-scroll::-webkit-scrollbar { display: none; }
+
+        .gallery-item {
+            min-width: 300px;
+            height: 420px;
+            background: #1a1a1a;
+            border-radius: 20px;
+            scroll-snap-align: center;
+            background-size: cover;
+            background-position: center;
+            border: 1px solid var(--glass-border);
+            transition: transform 0.4s ease;
+            position: relative;
+            transform: translateZ(0px) rotateY(0deg); /* Animación por JS */
+        }
+        .gallery-item:active { transform: scale(0.98) translateZ(-10px); }
+
+        /* RSVP SECCIÓN Y BOTÓN 3D */
+        .rsvp-section { padding: 0 20px; text-align: center; margin-top: 60px; transform-style: preserve-3d;}
+
+        /* Botón 3D físico */
+        .btn-3d-wrapper {
+            display: inline-block;
+            position: relative;
+            margin-top: 30px;
+            transform-style: preserve-3d;
+            transform: translateZ(50px);
+        }
+
+        .btn-3d {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 22px 40px;
+            background: var(--neon-pink);
+            color: var(--white);
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1rem;
+            text-transform: uppercase;
+            text-decoration: none;
+            border-radius: 100px;
+            border: none;
+            position: relative;
+            z-index: 2;
+            transition: all 0.1s ease;
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.3);
+            letter-spacing: 1px;
+        }
+
+        /* Profundidad inferior del botón (el "cuerpo") */
+        .btn-3d::after {
+            content: '';
+            position: absolute;
+            top: 6px; left: 0; width: 100%; height: 100%;
+            background: #b30059; /* Color fucsia oscuro */
+            border-radius: 100px;
+            z-index: -1;
+            transition: all 0.1s ease;
+        }
+
+        /* Efecto presionado */
+        .btn-3d:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 10px rgba(255, 0, 127, 0.5);
+        }
+        .btn-3d:active::after {
+            top: 2px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="noise"></div>
+    <div class="background-3d" id="particles3d">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        </div>
+
+    <div class="main-wrapper">
+        
+        <section class="hero reveal">
+            <div class="hero-date">10 . 04 . 2026</div>
+            <div class="title-3d-container" id="heroTitle3d">
+                <h1 class="hero-title layer-back">JADE</h1>
+                <h1 class="hero-title layer-front">JADE</h1>
+            </div>
+            <p style="margin-top: 10px; color: #AAAAAA; font-weight: 300; letter-spacing: 1px;">EIGHTEEN • VIP ACCESS ONLY</p>
+        </section>
+
+        <div class="marquee-container reveal">
+            <div class="marquee-content">
+                <span>IT'S A BRATZ VIBE 💅</span>
+                <span>ONLY VIP GUESTS ✨</span>
+                <span>BRATZ ENERGY 💋</span>
+                <span>PASSION FOR FASHION 🛍️</span>
+                <span>IT'S A BRATZ VIBE 💅</span>
+                <span>ONLY VIP GUESTS ✨</span>
+                <span>BRATZ ENERGY 💋</span>
+                <span>PASSION FOR FASHION 🛍️</span>
+            </div>
+        </div>
+
+        <section class="bento-grid">
+            
+            <div class="bento-card full reveal tilit-card">
+                <div class="bento-card-content">
+                    <h3>The Countdown</h3>
+                    <div class="countdown" id="reloj">
+                        <div><span id="days">00</span><small>Días</small></div>
+                        <div><span id="hours">00</span><small>Hrs</small></div>
+                        <div><span id="mins">00</span><small>Min</small></div>
+                        <div><span id="secs">00</span><small>Seg</small></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bento-card reveal tilit-card">
+                <div class="bento-card-content">
+                    <i class="fas fa-location-arrow bento-icon"></i>
+                    <h3>Where</h3>
+                    <p><strong>The Glam Club</strong><br>Coatepeque, Quetzaltenango.</p>
+                </div>
+            </div>
+
+            <div class="bento-card reveal tilit-card">
+                <div class="bento-card-content">
+                    <i class="fas fa-clock bento-icon"></i>
+                    <h3>When</h3>
+                    <p><strong>10 de Abril</strong><br>8:00 PM</p>
+                </div>
+            </div>
+
+            <div class="bento-card full reveal dress-code-card tilit-card">
+                <div class="bento-card-content">
+                    <h3 style="color: var(--white); font-size: 2rem;">Dress Code</h3>
+                    <p style="color: #fff; font-size: 1rem; margin-top: 10px;"><strong>Bratz / Y2K Glam.</strong> Leather, platforms, sparkles, pink & attitude. No basic fits allowed.</p>
+                </div>
+            </div>
+
+        </section>
+
+        <section class="gallery-wrapper reveal">
+            <h2 class="gallery-title reveal">VIBE<br>BOARD</h2>
+            <div class="gallery-scroll reveal" id="gallery3d">
+                <div class="gallery-item" style="background-image: url('https://i.pinimg.com/736x/aa/fb/40/aafb4013711b6bcd0c9ce3d23d19afe3.jpg');"></div>
+            </div>
+        </section>
+
+        <section class="bento-grid">
+            <div class="bento-card full reveal tilit-card">
+                <div class="bento-card-content">
+                    <i class="fas fa-envelope-open-text bento-icon"></i>
+                    <h3>Regalos</h3>
+                    <p>Tu presencia es top, pero acepto <strong>sobres o transferencias</strong> para mi shopping fund. 🛍️</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="rsvp-section reveal">
+            <h2 style="font-family: 'Syne'; font-size: 2.2rem; text-transform: uppercase;">Are you<br>on the list?</h2>
+            <p style="margin-top: 10px; color: #AAA;">Lista VIP. Confirma antes del 1 de abril.</p>
+            <div class="btn-3d-wrapper">
+                <a href="https://wa.me/1234567890?text=¡Hola Jade! Confirmo mi asistencia ULTRA-VIP a tu fiesta 3D 💋" target="_blank" class="btn-3d">
+                    CONFIRMAR ASISTENCIA
+                </a>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // --- 1. GENERADOR DE PARTÍCULAS 3D FLOTANTES ---
+        const particlesContainer = document.getElementById('particles3d');
+        const icons = ['✨', '💎', '⭐', '💋', '+'];
+        
+        for (let i = 0; i < 20; i++) {
+            const shape = document.createElement('div');
+            shape.className = 'floating-shape';
+            shape.innerHTML = icons[Math.floor(Math.random() * icons.length)];
+            shape.style.left = Math.random() * 100 + 'vw';
+            shape.style.top = Math.random() * 100 + 'vh';
+            shape.style.animationDelay = Math.random() * -15 + 's';
+            // Variables CSS para la animación float3D
+            shape.style.setProperty('--moveX', (Math.random() - 0.5) * 300 + 'px');
+            shape.style.setProperty('--moveY', (Math.random() - 0.5) * 500 + 'px');
+            particlesContainer.appendChild(shape);
+        }
+
+        // --- 2. 3D SCROLL EFFECTS (Parallax en Título y Bento Tilt) ---
+        const heroTitle = document.getElementById('heroTitle3d');
+        const layers = heroTitle.querySelectorAll('.hero-title');
+        const tilitCards = document.querySelectorAll('.tilit-card');
+        const galleryItems = document.querySelectorAll('.gallery-item');
+
+        window.addEventListener('scroll', () => {
+            const scrolled = window.scrollY;
+            const windowHeight = window.innerHeight;
+
+            // A. Hero Title 3D Parallax (Separa las capas al hacer scroll)
+            if (scrolled < windowHeight) {
+                const moveBack = scrolled * 0.1; // Se mueve lento hacia atrás
+                const moveFront = scrolled * 0.2; // Se mueve rápido hacia adelante
+                // Capa de neón trasera
+                layers[0].style.transform = `translate3d(0, 0, -20px) translateY(${moveBack}px)`;
+                // Capa blanca delantera
+                layers[1].style.transform = `translate3d(0, 0, 20px) translateY(${-moveFront}px)`;
+            }
+
+            // B. Bento Cards 3D Volumetría (Inclinan suaves en el eje X según scroll)
+            tilitCards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const cardCenter = rect.top + rect.height / 2;
+                const windowCenter = windowHeight / 2;
+                const distanceFromCenter = cardCenter - windowCenter;
+                
+                // Si la tarjeta está cerca de ser visible
+                if (rect.top < windowHeight && rect.bottom > 0) {
+                    // Inclinación máxima de +/- 10 grados según su posición en pantalla
+                    const tiltX = (distanceFromCenter / windowHeight) * -15; 
+                    card.style.transform = `rotateX(${tiltX}deg)`;
+                }
+            });
+
+            // C. Gallery Items 3D Rotation (Giran suavemente al scroll)
+            galleryItems.forEach(item => {
+                const rect = item.getBoundingClientRect();
+                if (rect.left < window.innerWidth && rect.right > 0) {
+                    // Giran levemente en eje Y al aparecer
+                    const rotateY = (rect.left / window.innerWidth - 0.5) * -20;
+                    item.style.transform = `translateZ(${10 - Math.abs(rotateY)}px) rotateY(${rotateY}deg)`;
+                }
+            });
+        });
+
+        // --- 3. SCROLL REVEAL (Intersection Observer) ---
+        const revealElements = document.querySelectorAll('.reveal');
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    // Delay staggered (en cascada)
+                    setTimeout(() => {
+                        entry.target.classList.add('active');
+                    }, index * 100); // 100ms entre cada elemento
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+
+        revealElements.forEach(el => revealObserver.observe(el));
+        // Hero activo inmediatamente
+        setTimeout(() => document.querySelector('.hero').classList.add('active'), 100);
+
+        // --- 4. COUNTDOWN ---
+        const countDownDate = new Date("April 10, 2026 20:00:00").getTime();
+        const relojDiv = document.getElementById("reloj");
+
+        setInterval(() => {
+            const now = new Date().getTime();
+            const distance = countDownDate - now;
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById("days").innerHTML = days.toString().padStart(2, '0');
+            document.getElementById("hours").innerHTML = hours.toString().padStart(2, '0');
+            document.getElementById("mins").innerHTML = minutes.toString().padStart(2, '0');
+            document.getElementById("secs").innerHTML = seconds.toString().padStart(2, '0');
+
+            if (distance < 0) {
+                clearInterval();
+                relojDiv.innerHTML = "<div style='width:100%; font-family:Syne; font-size:2rem; color:var(--neon-pink); translateZ(30px);'>ITS SHOWTIME 💋</div>";
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
