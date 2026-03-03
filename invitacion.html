@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JADE 18 • ULTRA-VIP 3D ACCESS</title>
+    <title>JADE 18 • ULTRA-VIP ACCESS</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -128,7 +128,7 @@
 
         .hero-title {
             font-family: 'Syne', sans-serif;
-            font-size: 5.5rem;
+            font-size: clamp(3.5rem, 18vw, 5.5rem); /* Escalado fluido */
             font-weight: 800;
             line-height: 0.85;
             text-transform: uppercase;
@@ -172,7 +172,7 @@
             display: flex;
             white-space: nowrap;
             font-family: 'Syne', sans-serif;
-            font-size: 1.4rem;
+            font-size: clamp(1.1rem, 4vw, 1.4rem); /* Escalado fluido */
             font-weight: 800;
             text-transform: uppercase;
             animation: scrollMarquee 20s linear infinite;
@@ -184,8 +184,8 @@
         .bento-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            padding: 0 20px;
+            gap: clamp(10px, 3vw, 15px); /* Espaciado fluido */
+            padding: 0 clamp(10px, 4vw, 20px);
             margin-bottom: 50px;
             transform-style: preserve-3d;
         }
@@ -195,7 +195,7 @@
             background: var(--glass);
             border: 1px solid var(--glass-border);
             border-radius: 20px;
-            padding: 30px 20px;
+            padding: clamp(20px, 5vw, 30px) clamp(10px, 4vw, 20px); /* Padding fluido */
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             transform-style: preserve-3d;
@@ -213,7 +213,7 @@
 
         .bento-card h3 {
             font-family: 'Syne', sans-serif;
-            font-size: 1.1rem;
+            font-size: clamp(0.95rem, 4vw, 1.1rem); /* Escalado fluido */
             color: var(--neon-pink);
             margin-bottom: 12px;
             text-transform: uppercase;
@@ -221,11 +221,11 @@
             transform: translateZ(20px);
         }
 
-        .bento-card p { font-size: 0.95rem; color: #BBBBBB; line-height: 1.6; transform: translateZ(10px); }
+        .bento-card p { font-size: clamp(0.85rem, 3.5vw, 0.95rem); color: #BBBBBB; line-height: 1.6; transform: translateZ(10px); }
         .bento-card strong { color: var(--white); font-weight: 500; }
 
         .bento-icon {
-            font-size: 2.2rem;
+            font-size: clamp(1.8rem, 6vw, 2.2rem); /* Escalado fluido */
             margin-bottom: 20px;
             color: var(--white);
             display: inline-block;
@@ -242,7 +242,7 @@
         }
 
         .countdown div { text-align: center; transform: translateZ(20px); }
-        .countdown span { display: block; font-family: 'Syne', sans-serif; font-size: 2.8rem; font-weight: 800; line-height: 1; color: var(--white); }
+        .countdown span { display: block; font-family: 'Syne', sans-serif; font-size: clamp(1.6rem, 7vw, 2.8rem); font-weight: 800; line-height: 1; color: var(--white); }
         .countdown small { font-size: 0.6rem; letter-spacing: 2px; color: #888; text-transform: uppercase; }
 
         /* DRESS CODE CON PROFUNDIDAD */
@@ -261,13 +261,13 @@
             padding: 0 0 50px 20px;
             transform-style: preserve-3d;
         }
-        .gallery-title { font-family: 'Syne', sans-serif; font-size: 2.8rem; text-transform: uppercase; margin-bottom: 25px; color: var(--white); }
+        .gallery-title { font-family: 'Syne', sans-serif; font-size: clamp(2rem, 10vw, 2.8rem); text-transform: uppercase; margin-bottom: 25px; color: var(--white); }
         .gallery-scroll { display: flex; gap: 18px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding-right: 20px; transform-style: preserve-3d;}
         .gallery-scroll::-webkit-scrollbar { display: none; }
 
         .gallery-item {
-            min-width: 300px;
-            height: 420px;
+            min-width: clamp(240px, 75vw, 300px); /* Escalado fluido */
+            height: clamp(340px, 100vw, 420px); /* Escalado fluido */
             background: #1a1a1a;
             border-radius: 20px;
             scroll-snap-align: center;
@@ -296,12 +296,12 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 22px 40px;
+            padding: clamp(16px, 4vw, 22px) clamp(24px, 6vw, 40px); /* Padding fluido */
             background: var(--neon-pink);
             color: var(--white);
             font-family: 'Syne', sans-serif;
             font-weight: 800;
-            font-size: 1rem;
+            font-size: clamp(0.85rem, 3vw, 1rem); /* Escalado fluido */
             text-transform: uppercase;
             text-decoration: none;
             border-radius: 100px;
@@ -399,8 +399,8 @@
 
             <div class="bento-card full reveal dress-code-card tilit-card">
                 <div class="bento-card-content">
-                    <h3 style="color: var(--white); font-size: 2rem;">Dress Code</h3>
-                    <p style="color: #fff; font-size: 1rem; margin-top: 10px;"><strong>Bratz / Y2K Glam.</strong> Leather, platforms, sparkles, pink & attitude. No basic fits allowed.</p>
+                    <h3 style="color: var(--white); font-size: clamp(1.6rem, 7vw, 2rem);">Dress Code</h3>
+                    <p style="color: #fff; font-size: clamp(0.9rem, 4vw, 1rem); margin-top: 10px;"><strong>Bratz / Y2K Glam.</strong> Leather, platforms, sparkles, pink & attitude. No basic fits allowed.</p>
                 </div>
             </div>
 
@@ -424,8 +424,8 @@
         </section>
 
         <section class="rsvp-section reveal">
-            <h2 style="font-family: 'Syne'; font-size: 2.2rem; text-transform: uppercase;">Are you<br>on the list?</h2>
-            <p style="margin-top: 10px; color: #AAA;">Lista VIP. Confirma antes del 1 de abril.</p>
+            <h2 style="font-family: 'Syne'; font-size: clamp(1.7rem, 8vw, 2.2rem); text-transform: uppercase;">Are you<br>on the list?</h2>
+            <p style="margin-top: 10px; color: #AAA; font-size: clamp(0.9rem, 4vw, 1rem);">Lista VIP. Confirma antes del 1 de abril.</p>
             <div class="btn-3d-wrapper">
                 <a href="https://wa.me/1234567890?text=¡Hola Jade! Confirmo mi asistencia ULTRA-VIP a tu fiesta 3D 💋" target="_blank" class="btn-3d">
                     CONFIRMAR ASISTENCIA
